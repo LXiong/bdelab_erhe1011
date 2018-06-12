@@ -21,9 +21,12 @@ public class WordcountTopology {
         builder.setBolt("split_bolt", new SplitSentenceBolt(), 2)
                 .shuffleGrouping("kafka_spout", SentenceSpout.STREAM_NAME);
 
-        builder.setBolt("count_bolt", new WordCountBolt(), 2)
-                .fieldsGrouping("split_bolt", new Fields("word"));
-
+        builder.setBolt("hourbucked_bolt", new HourBuckedBolt(), 2)
+               .fieldsGrouping("split_bolt", new Fields("url"));
+        
+        builder.setBolt("viewcount_bolt", new ViewCountBolt(), 2)
+        .fieldsGrouping("hourbucked_bolt", new Fields("hour-bucked"));
+        
         return builder.createTopology();
     }
 
